@@ -14,10 +14,10 @@ import (
 type Ts struct {
 	config *Config
 	client *resty.Client
+	metric [][]byte
 	db     *bbolt.DB
-
-	mu  sync.Mutex
-	err error
+	mu     sync.Mutex
+	err    error
 }
 
 // NewTs 初始化一个新的 Ts 实例

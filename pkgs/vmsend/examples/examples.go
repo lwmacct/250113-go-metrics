@@ -32,11 +32,9 @@ func (e *Example) mian() {
 		},
 	)
 	m1.AddValue(1.0, time.Now().In(m_time.GetMux().Location).UnixMilli()) // 添加值
-	vms.AddMetric(m1)                                                     // 添加指标
+	vms.AddMetric(m1.ToJSON())
 	vms.Flush()
-
 	time.Sleep(1 * time.Second)
-
 	// 定期发送指标
 	go vms.Ticker(60*time.Second, context.Background())
 

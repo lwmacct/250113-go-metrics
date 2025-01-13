@@ -54,7 +54,7 @@ func (t *Ts) Gather() error {
 				md := NewMetric(mapp)
 				// 毫秒时间戳
 				md.AddValue(m.Gauge.GetValue(), UnixMilli)
-				t.AddMetric(md)
+				t.AddMetric(md.ToJSON())
 			}
 		}
 	}
