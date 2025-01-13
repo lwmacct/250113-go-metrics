@@ -1,4 +1,4 @@
-package vmsend
+package examples
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/lwmacct/241224-go-template-pkgs/m_log"
 	"github.com/lwmacct/241224-go-template-pkgs/m_time"
+	"github.com/lwmacct/250113-go-metrics/pkgs/vmsend"
 )
 
 type Example struct{}
@@ -13,18 +14,18 @@ type Example struct{}
 func (e *Example) mian() {
 
 	// 设置 PromReg 可以定期发送指标
-	vmc := NewConfig(
+	vmc := vmsend.NewConfig(
 		"http://localhost:8428/api/v1/import",
 		"user:password",
 	).SetPromReg(nil)
-	vms, err := NewTs(vmc)
+	vms, err := vmsend.NewTs(vmc)
 
 	if err != nil {
 		m_log.Error(m_log.H{"msg": "vmsend.NewTs", "data": err.Error()})
 		return
 	}
 
-	m1 := NewMetric(
+	m1 := vmsend.NewMetric(
 		map[string]string{
 			"__name__": "m_250112_test_001",
 			"app":      "vmsend",
