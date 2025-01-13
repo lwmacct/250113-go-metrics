@@ -1,14 +1,10 @@
 package vmsend
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"go.etcd.io/bbolt"
 )
@@ -64,127 +60,4 @@ func NewTs(config *Config) (*Ts, error) {
 		return nil, errors.Wrap(t.err, "无法创建或打开 Bucket")
 	}
 	return t, nil
-}
-
-// 将 Metric 持久化到 BoltDB
-func (t *Ts) AddMetric(m *Metric) error {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	//
-	data, err := m.ToJSON()
-	if err != nil {
-		return err
-	}
-	key := uuid.New().String()
-	return t.db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(t.config.MetricsBucket))
-		return b.Put([]byte(key), data)
-	})
-}
-
-// 获取所 BoltDB 中所有待发送的 Metrics
-func (t *Ts) getPendingMetrics() ([]*Metric, map[string][]byte, error) {
-	var metrics []*Metric
-	keys := make(map[string][]byte)
-	err := t.db.View(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(t.config.MetricsBucket))
-		if b == nil {
-			return nil
-		}
-		return b.ForEach(func(k, v []byte) error {
-			var metric Metric
-			if err := json.Unmarshal(v, &metric); err != nil {
-				fmt.Printf("无法解析指标 (key: %s): %v\n", string(k), err)
-				return nil // 跳过无法解析的条目
-			}
-			metrics = append(metrics, &metric)
-			keys[string(k)] = v
-			return nil
-		})
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-	return metrics, keys, nil
-}
-
-func (t *Ts) toJsonLine(metrics []*Metric) ([]byte, error) {
-	// 创建一个缓冲区来存储序列化后的 JSON 对象
-	var buffer bytes.Buffer
-	for _, metric := range metrics {
-		metricJSON, err := json.Marshal(metric)
-		if err != nil {
-			return nil, errors.Wrap(err, "序列化 Metric 失败")
-		}
-		buffer.Write(metricJSON)
-		buffer.WriteByte('\n')
-	}
-	return buffer.Bytes(), nil
-}
-
-// 发送一批 Metrics
-func (t *Ts) sendBatch(metrics []*Metric) error {
-
-	body, err := t.toJsonLine(metrics)
-	if err != nil {
-		return errors.Wrap(err, "序列化 Metrics 失败")
-	}
-
-	// 发送 HTTP POST 请求
-	resp, err := t.client.R().
-		SetDebug(false).
-		SetHeader("Content-Type", "application/json").
-		SetBasicAuth(t.config.BasicAuth[0], t.config.BasicAuth[1]).
-		SetBody(body).
-		Post(t.config.VmdbImportUrl)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode() != 204 {
-		return fmt.Errorf("收到非204的状态码: %d, 响应体: %s", resp.StatusCode(), resp.String())
-	}
-	return nil
-}
-
-// 发送所有待发送的 Metrics
-func (t *Ts) Flush() error {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	metrics, keys, err := t.getPendingMetrics()
-	if err != nil {
-		return errors.Wrap(err, "获取待发送指标失败")
-	}
-
-	if len(metrics) == 0 {
-		return nil
-	}
-
-	// 发送批量指标
-	err = t.sendBatch(metrics)
-	if err != nil {
-		return errors.Wrap(err, "发送批量指标失败")
-	}
-
-	// 发送成功后，删除已发送的指标
-	err = t.db.Update(func(tx *bbolt.Tx) error {
-		b := tx.Bucket([]byte(t.config.MetricsBucket))
-		for k := range keys {
-			if err := b.Delete([]byte(k)); err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return errors.Wrap(err, "删除已发送的指标失败")
-	}
-	return nil
-}
-
-// Close 关闭 BoltDB 数据库
-func (t *Ts) Close() error {
-	return t.db.Close()
 }

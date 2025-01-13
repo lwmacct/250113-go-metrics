@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"sync"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/lwmacct/241224-go-template-pkgs/m_to"
 )
 
@@ -53,4 +54,20 @@ func (m *Metric) ToJSON() ([]byte, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return json.Marshal(m)
+}
+
+// 发送 Metric 到 TSDB
+func (m *Metric) Send(client *resty.Client, url string) (*resty.Response, error) {
+	m.mu.Lock()
+	body, err := json.Marshal(m)
+	m.mu.Unlock()
+
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(body).
+		Post(url)
+	return resp, err
 }
