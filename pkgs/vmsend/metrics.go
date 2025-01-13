@@ -50,12 +50,21 @@ func (m *Metrics) AddValueAny(value any, timestamp any) {
 }
 
 // 添加一个标签到指标中
-func (m *Metrics) AddLabel(key string, value string) {
+func (m *Metrics) SetLabel(key string, value string) {
 	if m.Lock {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 	}
 	m.Metric[key] = value
+}
+
+// 替换所有标签
+func (m *Metrics) SetLabels(label map[string]string) {
+	if m.Lock {
+		m.mu.Lock()
+		defer m.mu.Unlock()
+	}
+	m.Metric = label
 }
 
 // 替换指标的值和时间戳
