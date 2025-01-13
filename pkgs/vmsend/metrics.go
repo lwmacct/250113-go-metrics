@@ -14,7 +14,7 @@ type Metrics struct {
 	Values     []float64         `json:"values"`
 	Timestamps []int64           `json:"timestamps"`
 
-	Lock bool `json:"-"`
+	lock bool `json:"-"`
 	mu   sync.Mutex
 }
 
@@ -24,13 +24,13 @@ func NewMetrics(label map[string]string) *Metrics {
 		Metric:     label,
 		Values:     make([]float64, 0),
 		Timestamps: make([]int64, 0),
-		Lock:       false,
+		lock:       false,
 	}
 }
 
 // 添加一个值和时间戳到指标中
 func (m *Metrics) AddValue(value float64, timestamp int64) {
-	if m.Lock {
+	if m.lock {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 	}
@@ -41,7 +41,7 @@ func (m *Metrics) AddValue(value float64, timestamp int64) {
 
 // 添加一个值和时间戳到指标中
 func (m *Metrics) AddValueAny(value any, timestamp any) {
-	if m.Lock {
+	if m.lock {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 	}
@@ -49,9 +49,14 @@ func (m *Metrics) AddValueAny(value any, timestamp any) {
 	m.Timestamps = append(m.Timestamps, m_to.Int64(timestamp))
 }
 
+// 设置是否加锁
+func (m *Metrics) SetLock(lock bool) {
+	m.lock = lock
+}
+
 // 添加一个标签到指标中
 func (m *Metrics) SetLabel(key string, value string) {
-	if m.Lock {
+	if m.lock {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 	}
@@ -60,7 +65,7 @@ func (m *Metrics) SetLabel(key string, value string) {
 
 // 替换所有标签
 func (m *Metrics) SetLabels(label map[string]string) {
-	if m.Lock {
+	if m.lock {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 	}
@@ -69,7 +74,7 @@ func (m *Metrics) SetLabels(label map[string]string) {
 
 // 替换指标的值和时间戳
 func (m *Metrics) SetValues(values []float64, timestamps []int64) {
-	if m.Lock {
+	if m.lock {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 	}
@@ -79,7 +84,7 @@ func (m *Metrics) SetValues(values []float64, timestamps []int64) {
 
 // 序列化 Metric 为 JSON 字符串
 func (m *Metrics) ToJSON() []byte {
-	if m.Lock {
+	if m.lock {
 		m.mu.Lock()
 		defer m.mu.Unlock()
 	}
