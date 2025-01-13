@@ -20,13 +20,16 @@ func (t *Ts) Flush() error {
 		return nil
 	}
 
+	sendData := t.metric
+	t.metric = t.metric[:0]
+	t.mu.Unlock()
+
+	// ------------------------
 	var buffer bytes.Buffer
-	for _, metric := range t.metric {
+	for _, metric := range sendData {
 		buffer.Write(metric)
 		buffer.WriteByte('\n')
 	}
-	t.metric = t.metric[:0]
-	t.mu.Unlock()
 
 	resp, err := t.client.R().
 		SetHeader("Content-Type", "application/json").
@@ -39,6 +42,10 @@ func (t *Ts) Flush() error {
 	}
 
 	if resp.StatusCode() != 204 {
+		for _, metric := range sendData {
+			// 重新加入未发送的指标
+			t.AddMetric(metric)
+		}
 		return errors.New("http status code not 204")
 	}
 	return nil
