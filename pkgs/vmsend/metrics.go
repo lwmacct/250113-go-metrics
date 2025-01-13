@@ -19,7 +19,7 @@ type Metrics struct {
 }
 
 // 初始化一个新的 Metric 实例
-func NewMetric(label map[string]string) *Metrics {
+func NewMetrics(label map[string]string) *Metrics {
 	return &Metrics{
 		Metric:     label,
 		Values:     make([]float64, 0),

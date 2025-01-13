@@ -51,7 +51,7 @@ func (t *Ts) Gather() error {
 				for _, l := range rawLabel {
 					mapp[l.GetName()] = l.GetValue()
 				}
-				md := NewMetric(mapp)
+				md := NewMetrics(mapp)
 				// 毫秒时间戳
 				md.AddValue(m.Gauge.GetValue(), UnixMilli)
 				t.AddMetric(md.ToJSON())

@@ -25,7 +25,7 @@ func (e *Example) mian() {
 		return
 	}
 
-	m1 := vmsend.NewMetric(
+	m1 := vmsend.NewMetrics(
 		map[string]string{
 			"__name__": "m_250112_test_001",
 			"app":      "vmsend",
