@@ -1,3 +1,4 @@
+// vmsend.priv.go
 package vmsend
 
 import (
