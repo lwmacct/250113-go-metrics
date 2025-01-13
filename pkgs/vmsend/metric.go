@@ -40,7 +40,7 @@ func (m *Metric) AddValueAny(value any, timestamp any) {
 	m.Timestamps = append(m.Timestamps, m_to.Int64(timestamp))
 }
 
-// 设置多个值和时间戳
+// 替换指标的值和时间戳
 func (m *Metric) SetValues(values []float64, timestamps []int64) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
