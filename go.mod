@@ -1,4 +1,4 @@
-module github.com/lwmacct/241224-go-template-mini
+module github.com/lwmacct/250113-go-metrics
 
 go 1.23.4
 

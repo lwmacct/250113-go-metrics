@@ -1,9 +1,9 @@
 package test
 
 import (
-	"github.com/lwmacct/241224-go-template-mini/app"
 	"github.com/lwmacct/241224-go-template-pkgs/m_cmd"
 	"github.com/lwmacct/241224-go-template-pkgs/m_log"
+	"github.com/lwmacct/250113-go-metrics/app"
 	"github.com/spf13/cobra"
 )
 

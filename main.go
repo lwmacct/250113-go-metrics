@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lwmacct/241224-go-template-mini/app"
-	"github.com/lwmacct/241224-go-template-mini/app/start"
-	"github.com/lwmacct/241224-go-template-mini/app/test"
-	"github.com/lwmacct/241224-go-template-mini/app/version"
 	"github.com/lwmacct/241224-go-template-pkgs/m_cmd"
 	"github.com/lwmacct/241224-go-template-pkgs/m_log"
+	"github.com/lwmacct/250113-go-metrics/app"
+	"github.com/lwmacct/250113-go-metrics/app/start"
+	"github.com/lwmacct/250113-go-metrics/app/test"
+	"github.com/lwmacct/250113-go-metrics/app/version"
 )
 
 var mc *m_cmd.Ts
