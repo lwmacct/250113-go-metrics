@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/lwmacct/241224-go-template-pkgs/m_to"
+	"github.com/lwmacct/241224-go-template-pkgs/pkgs/m_to"
 )
 
 // 表示单个指标的数据

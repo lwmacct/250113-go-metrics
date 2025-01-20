@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/go-resty/resty/v2 v2.16.3
-	github.com/lwmacct/241224-go-template-pkgs v0.0.1736542860
+	github.com/lwmacct/241224-go-template-pkgs v0.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.20.5
 	github.com/spf13/cobra v1.8.1

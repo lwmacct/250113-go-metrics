@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lwmacct/241224-go-template-pkgs/m_log"
-	"github.com/lwmacct/241224-go-template-pkgs/m_time"
+	"github.com/lwmacct/241224-go-template-pkgs/pkgs/m_log"
+	"github.com/lwmacct/241224-go-template-pkgs/pkgs/m_time"
 	"github.com/lwmacct/250113-go-metrics/pkgs/vmsend"
 )
 
